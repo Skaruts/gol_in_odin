@@ -2,15 +2,15 @@ package main
 
 import "core:fmt"
 import "core:mem"
-
 import rl "vendor:raylib"
 
 import "data"
 import bres "libs/bresenham"
 
 // import life "life/simple"
-import life "life/abrash"
+// import life "life/abrash"
 // import life "life/simple/static"
+import life "life/abrash/static"
 
 
 print := fmt.println
