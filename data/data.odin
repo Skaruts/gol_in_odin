@@ -14,8 +14,8 @@ SW :: 1280
 SH :: 800
 
 // this is basically the size of a cell in pixels
-// best to keep this to multiples, 1, 2, 4, 8, etc
-scale :: 4
+// best to keep this to multiples, 1, 2, 4, 8, etc (bit shifting ensures it)
+scale :: int(1) << 2
 
 GW :: SW/scale
 GH :: SH/scale
