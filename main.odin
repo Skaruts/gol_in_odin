@@ -6,7 +6,11 @@ import "core:mem"
 import rl "vendor:raylib"
 
 import "data"
-import "life"
+import bres "libs/bresenham"
+
+// import life "life/simple"
+import life "life/abrash"
+// import life "life/simple/static"
 
 
 print := fmt.println
@@ -46,17 +50,14 @@ main :: proc() {
 
 	rl.SetTraceLogLevel(rl.TraceLogLevel.WARNING)
 
-	rl.InitWindow(data.SW, data.SH, "odin/raylib test - game of life")
+	rl.InitWindow(data.SW, data.SH, "Game of Life - Odin/Raylib")
 	defer rl.CloseWindow()
 
 	rl.SetTargetFPS(60)
 
-	data.init_screen() // data.odin
+	data.init_screen()
 
-	// algo := life.Algorithm.SIMPLE
-	algo := life.Algorithm.ABRASH
-
-	life.init(algo)
+	life.init()
 	life.randomize_cells()
 
 	t1 := rl.GetTime()
@@ -88,7 +89,7 @@ main :: proc() {
 		check_bad_frees(&tracking_allocator)
 	}
 
-	life.destroy(algo)
+	life.destroy()
 
 	if reset_tracking_allocator(&tracking_allocator) {
 		// fmt.printf("press space to continue...")
@@ -105,13 +106,13 @@ toggle_pause :: proc() {
 
 draw_cells :: proc(gm:[2]int) {
 	using data
-	points := bres_line(last_gm.x, last_gm.y, gm.x, gm.y)
+	points := bres.line(last_gm.x, last_gm.y, gm.x, gm.y)
 	for p in points do life.revive_cell(p.x, p.y)
 }
 
 erase_cells :: proc(gm:[2]int) {
 	using data
-	points := bres_line(last_gm.x, last_gm.y, gm.x, gm.y)
+	points := bres.line(last_gm.x, last_gm.y, gm.x, gm.y)
 	for p in points do life.kill_cell(p.x, p.y)
 }
 

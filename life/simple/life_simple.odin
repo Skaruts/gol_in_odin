@@ -1,61 +1,60 @@
-package life
+package life_simple
 
 import "core:fmt"
 import "core:slice"
 import rl "vendor:raylib"
 
-import "../data"
+import "../../data"
+
+print :: fmt.println
 
 /*
 
-		Simplest life algorithm
+	Simplest life algorithm (using slices)
 
-			- iterates the entire array to apply rules
-			- swaps borders to avoid checking bounds
-			- alternates between two boards to avoid slow copying
+		- iterates the entire array to apply rules
+		- swaps borders to avoid checking bounds
+		- alternates between two boards to avoid slow copying
+
+
+	TODO:
+		- add way to turn off border visualization without leaving blank borders
 
 */
 
-@(private="file") curr :int
-@(private="file") prev :int
-@(private="file") ALIVE :: 1
-@(private="file") DEAD  :: 0
+@private ALIVE :: 1
+@private DEAD  :: 0
 
-life_init_simple :: proc(/*life:^Life*/) {
+@private cells : [2][][]int
+
+@private debug_draw_borders := false
+@private wrap_around := true
+@private curr := 1
+@private prev := 0
+
+
+init :: proc() {
 	print("initing SIMPLE algorithm")
-	curr = 1
-	prev = 0
 
-	life.debug_draw_borders = false
-	life.cells = _create_cells()
-
-	revive_cell      = ls_revive_cell
-	kill_cell        = ls_kill_cell
-	randomize_cells  = ls_randomize_cells
-	fill_grid        = ls_fill_grid
-	clear_grid       = ls_clear_grid
-	compute_gen      = ls_compute_gen
-	draw_grid        = ls_draw_grid
+	_create_cells()
 }
 
-@(private="file")
-_inbounds :: proc(x, y:int) -> bool {
+@private _inbounds :: proc(x, y:int) -> bool {
 	using data
 	// keep in mind the 1 cell border all around
 	return x > 0 && x < GW-1 && y > 0 && y < GH-1
 }
 
-life_destroy_simple :: proc() {
+destroy :: proc() {
 	for j in 0 ..< data.GH {
-		delete(life.cells[0][j])
-		delete(life.cells[1][j])
+		delete(cells[0][j])
+		delete(cells[1][j])
 	}
-	delete(life.cells[0])
-	delete(life.cells[1])
+	delete(cells[0])
+	delete(cells[1])
 }
 
-@(private="file")
-_create_cells :: proc() -> [2][][]int {
+@private _create_cells :: proc() {
 	using data
 	s1 := make([][]int, GH)
 	s2 := make([][]int, GH)
@@ -64,12 +63,9 @@ _create_cells :: proc() -> [2][][]int {
 		s2[j] = make([]int, GW)
 	}
 
-	cells := [2][][]int{s1, s2}
+	cells = [2][][]int{s1, s2}
 
-	// understanding Tetralux's post about slices and memory:
-	//   https://discord.com/channels/568138951836172421/568871298428698645/1144199020152111176
-
-	if life.wrap_around {
+	if wrap_around {
 		/*
 			Since I use row-major order, the horizontal borders (top & bottom)
 			only need to be swapped once here.
@@ -87,20 +83,18 @@ _create_cells :: proc() -> [2][][]int {
 		cells[1][GH-1] = cells[1][1]
 		cells[1][0]    = cells[1][GH-2]
 	}
-
-	return cells
 }
 
 
 /***************************************************
 		Compute Generation
 */
-ls_compute_gen :: proc() {
+compute_gen :: proc() {
 	using data
 
 	curr, prev = prev, curr
-	p := life.cells[prev]
-	c := life.cells[curr]
+	p := cells[prev]
+	c := cells[curr]
 
 	l, r, u, d:int
 	n:int // alive neighbor count
@@ -125,7 +119,7 @@ ls_compute_gen :: proc() {
 		}
 	}
 
-	if life.wrap_around do _swap_borders()
+	if wrap_around do _swap_borders()
 }
 
 
@@ -134,9 +128,9 @@ ls_compute_gen :: proc() {
 /***************************************************
 		Rendering
 */
-ls_draw_grid :: proc() {
+draw_grid :: proc() {
 	using data
-	c := life.cells[curr]
+	c := cells[curr]
 
 	for j in 1..<GH-1 {
 		cj := c[j]
@@ -150,10 +144,9 @@ ls_draw_grid :: proc() {
 }
 
 
-@(private="file")
-_draw_border_cells :: proc() {
+@private _draw_border_cells :: proc() {
 	using data
-	c := life.cells[curr]
+	c := cells[curr]
 
 	for j in 0..<GH {
 		cj := c[j]
@@ -169,10 +162,9 @@ _draw_border_cells :: proc() {
 
 
 
-@(private="file")
-_swap_borders :: proc() {
+@private _swap_borders :: proc() {
 	using data
-	c := life.cells[curr]
+	c := cells[curr]
 
 	for j in 0..<GH {
 		cj := c[j]
@@ -180,16 +172,16 @@ _swap_borders :: proc() {
 		cj[GW-1] = cj[ 1  ]
 	}
 
-	// no need to swap horizontal borders when using slices
+	// no need to swap vertical borders when using slices
 	// c[GH-1] = c[1]
 	// c[0]    = c[GH-2]
 }
 
-ls_revive_cell :: proc(x, y:int) {
+revive_cell :: proc(x, y:int) {
 	using data
 	if !_inbounds(x, y) do return
 
-	cy := life.cells[curr][y]
+	cy := cells[curr][y]
 	cy[x] = ALIVE
 
 	// update vertical borders
@@ -197,11 +189,11 @@ ls_revive_cell :: proc(x, y:int) {
 	if x == GW-2 do cy[ 0  ] = ALIVE
 }
 
-ls_kill_cell :: proc(x, y:int) {
+kill_cell :: proc(x, y:int) {
 	using data
 	if !_inbounds(x, y) do return
 
-	cy := life.cells[curr][y]
+	cy := cells[curr][y]
 	cy[x] = DEAD
 
 	// update vertical borders
@@ -209,11 +201,11 @@ ls_kill_cell :: proc(x, y:int) {
 	if x == GW-2 do cy[ 0  ] = DEAD
 }
 
-ls_randomize_cells :: proc() {
+randomize_cells :: proc() {
 	using data
-	c := life.cells[curr]
+	c := cells[curr]
 
-	ls_clear_grid(DEAD)
+	clear_grid(DEAD)
 
 	for j in 1..<GH-1 {
 		for i in 1..<GW-1 {
@@ -223,14 +215,14 @@ ls_randomize_cells :: proc() {
 	}
 }
 
-ls_fill_grid :: proc() {
-	ls_clear_grid(ALIVE)
+fill_grid :: proc() {
+	clear_grid(ALIVE)
 }
 
 
-ls_clear_grid :: proc(val:=DEAD) {
+clear_grid :: proc(val:=DEAD) {
 	using data
-	c := life.cells[curr]
+	c := cells[curr]
 
 	for j in 1..<GH-1 {
 		for i in 1..<GW-1 {

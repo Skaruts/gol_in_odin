@@ -1,9 +1,9 @@
-package main
-import rl "vendor:raylib"
+package bresenham
+// import rl "vendor:raylib"
 
 
 // Bresenham's line (returns a list of points that make up the line)
-bres_line :: proc(x1, y1, x2, y2:int, exclude_start:=false) -> [dynamic][2]int {
+line :: proc(x1, y1, x2, y2:int, exclude_start:=false) -> [dynamic][2]int {
 	x1, y1, x2, y2 := x1, y1, x2, y2
 
 	points := make([dynamic][2]int, context.temp_allocator)
@@ -45,7 +45,7 @@ bres_line :: proc(x1, y1, x2, y2:int, exclude_start:=false) -> [dynamic][2]int {
 }
 
 
-// bres_linev :: proc(x1, y1, x2, y2:f32, exclude_start:=false) -> [dynamic]rl.Vector2 {
+// linev :: proc(x1, y1, x2, y2:f32, exclude_start:=false) -> [dynamic]rl.Vector2 {
 // 	x1, y1, x2, y2 := x1, y1, x2, y2
 
 // 	points := make([dynamic]rl.Vector2, context.temp_allocator)

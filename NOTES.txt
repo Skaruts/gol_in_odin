@@ -1,0 +1,3 @@
+
+- understanding Tetralux's post about slices and memory:
+	https://discord.com/channels/568138951836172421/568871298428698645/1144199020152111176
