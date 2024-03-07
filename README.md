@@ -3,7 +3,7 @@
 Following the GoL articles writen by Eric Clippert, as I feel like it, as a way to practice coding in Odin. (Different variations of algorithms are my way of keeping in mind alternative ways to do things, for later reference).
 
 This is by far the most comprehensive and complete GoL programming guide I ever came across (all algorithms explained):
-- https://ericlippert.com/2020/04/13/life-part-1/
+- https://ericlippert.com/2020/04/13/life-part-1/  (intro)
 - https://ericlippert.com/2020/04/20/life-part-2/
 - https://ericlippert.com/2020/04/23/life-part-3/
 - https://ericlippert.com/2020/04/27/life-part-4/
